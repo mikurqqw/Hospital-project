@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    /* Базовые цвета для всего приложения, автоматически меняются от темы */
+    @apply bg-bgLight text-textMain dark:bg-bgDark dark:text-textMainDark transition-colors duration-300 antialiased;
+  }
+}
