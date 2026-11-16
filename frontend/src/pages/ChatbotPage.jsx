@@ -10,6 +10,7 @@ const ChatbotPage = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -33,7 +34,9 @@ const ChatbotPage = () => {
           setMessages(history);
         }
       } catch (error) {
-        console.error("Ошибка загрузки истории", error);
+        setMessages([{ role: "assistant", content: error.response?.data?.detail || "Не удалось загрузить историю. Обновите страницу." }]);
+      } finally {
+        setIsHistoryLoading(false);
       }
     };
     fetchHistory();
@@ -73,7 +76,7 @@ const ChatbotPage = () => {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || isHistoryLoading) return;
 
     window.speechSynthesis.cancel(); // Останавливаем речь при новом запросе
     setIsSpeaking(false);
@@ -107,26 +110,12 @@ const ChatbotPage = () => {
         throw new Error(problem.detail || "Ошибка сервера");
       }
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder("utf-8");
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunkText = decoder.decode(value, { stream: true });
-        setMessages((prev) => {
-          const newMsgs = [...prev];
-          newMsgs[newMsgs.length - 1].content += chunkText;
-          return newMsgs;
-        });
-      }
+      const answer = await response.text();
+      setMessages((prev) => prev.map((message, index) =>
+        index === prev.length - 1 ? { ...message, content: answer } : message));
     } catch (error) {
-      setMessages((prev) => {
-        const newMsgs = [...prev];
-        newMsgs[newMsgs.length - 1].content =
-          `⚠️ ${error.message}`;
-        return newMsgs;
-      });
+      setMessages((prev) => prev.map((message, index) =>
+        index === prev.length - 1 ? { ...message, content: `⚠️ ${error.message}` } : message));
     } finally {
       setIsLoading(false);
     }
@@ -265,14 +254,14 @@ const ChatbotPage = () => {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Опишите вашу проблему..."
-              disabled={isLoading}
+              placeholder={isHistoryLoading ? "Загрузка истории…" : "Опишите вашу проблему..."}
+              disabled={isLoading || isHistoryLoading}
               className="w-full py-4 pl-6 pr-16 transition-all bg-white border border-gray-200 shadow-sm outline-none rounded-2xl focus:ring-2 focus:ring-primary disabled:opacity-70"
             />
             <button
               aria-label="Отправить сообщение"
               type="submit"
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isLoading || isHistoryLoading}
               className="absolute p-3 text-white transition-colors right-2 bg-primary rounded-xl hover:bg-primaryHover disabled:opacity-50"
             >
               <Send className="w-5 h-5" />

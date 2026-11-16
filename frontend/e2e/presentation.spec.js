@@ -14,8 +14,13 @@ test("registration, authenticated AI flows, accessibility and responsive themes"
   await dialog.getByRole("button", { name: "Регистрация", exact: true }).click();
   await expect(dialog).not.toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("token"))).toBeNull();
+  await page.route("**/api/chat/history", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    await route.fulfill({status:200, contentType:"application/json", body:"[]"});
+  });
   await page.getByRole("button", { name: /AI Консультант/ }).click();
   await expect(page).toHaveURL(/\/chat$/);
+  await expect(page.getByLabel("Сообщение", { exact: true })).toBeDisabled();
   await page.route("**/api/chat/message", (route) => route.fulfill({
     status: 200, contentType: "text/plain", body: "Учебный ответ Gemini. Обратитесь к врачу.",
   }));
