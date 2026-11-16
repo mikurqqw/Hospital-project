@@ -4,7 +4,10 @@ Verified on 2026-11-16.
 
 - Live app: https://ai-health-hospital-demo.onrender.com
 - Render service: `srv-dbtbki56e07s73c0kvng`, Free, Frankfurt, Docker.
-- Application source commit: `400ef4dfcb44b27ccae9ebfdafb4ff893d82e50c`.
+- Final deployed application commit: `db9a3ace6fbc730e12386dbcbbaa2362ecf4c6e8`.
+- Final Render deploy `dep-dbtbnpei0phs73f9fas0`: live.
+- Public-URL Playwright regression: passed in 31.5 s, including delayed chat-history loading.
+- GitHub Actions for the deployed application commit: success (run `43829837493`).
 - Automatic deploys are disabled. Later code changes require a manual Render deploy.
 - `/api/healthz`: HTTP 200, database ready, AI configured.
 - Public registration: HTTP 201; login: HTTP 200.
