@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Upload, FileImage, AlertCircle, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../api/index";
+import api from "../api/Index";
 
 const DiagnosticsPage = () => {
   const [file, setFile] = useState(null);
@@ -27,14 +27,13 @@ const DiagnosticsPage = () => {
     formData.append("file", file);
 
     try {
-      // Запрос к локальной модели LLaVA
+      // Request cloud image analysis
       const response = await api.post("/diagnostics/image", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResult(response.data.analysis);
     } catch (error) {
-      console.error(error);
-      setResult("Ошибка анализа. Убедитесь, что ИИ-модуль запущен.");
+      setResult(error.response?.data?.detail || "Ошибка анализа. Повторите позже.");
     } finally {
       setIsLoading(false);
     }
@@ -60,8 +59,8 @@ const DiagnosticsPage = () => {
             transition={{ delay: 0.1 }}
             className="text-lg text-textMuted dark:text-textMutedDark max-w-2xl mx-auto"
           >
-            Загрузите рентгеновский снимок или МРТ. Наша локальная нейросеть
-            проанализирует изображение за несколько секунд.
+            Загрузите учебное изображение PNG, JPEG или WebP до 5 МБ.
+            Gemini опишет его без постановки диагноза. Не загружайте персональные данные.
           </motion.p>
         </div>
 
@@ -163,7 +162,7 @@ const DiagnosticsPage = () => {
                   >
                     <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
                     <p className="font-medium animate-pulse">
-                      LLaVA обрабатывает изображение...
+                      Gemini обрабатывает изображение...
                     </p>
                   </motion.div>
                 ) : result ? (

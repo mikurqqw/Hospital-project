@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Send, User, Bot, Trash2, Volume2, Square } from "lucide-react";
 import { getChatHistory, clearChatHistory } from "../api/chat";
 import { useAuthStore } from "../store/authStore";
-import api from "../api/index";
+import api from "../api/Index";
 
 const ChatbotPage = () => {
   const { user } = useAuthStore();
@@ -89,13 +89,8 @@ const ChatbotPage = () => {
     setIsLoading(true);
 
     try {
-      let token = "";
-      const authStorage = localStorage.getItem("auth-storage");
-      if (authStorage) token = JSON.parse(authStorage)?.state?.token;
-
-      const baseUrl = (
-        api.defaults.baseURL || "http://127.0.0.1:8000/api"
-      ).replace(/\/$/, "");
+      const token = useAuthStore.getState().token;
+      const baseUrl = api.defaults.baseURL.replace(/\/$/, "");
       const fetchUrl = `${baseUrl}/chat/message`;
 
       const response = await fetch(fetchUrl, {
@@ -107,7 +102,10 @@ const ChatbotPage = () => {
         body: JSON.stringify({ message: userMsg }),
       });
 
-      if (!response.ok) throw new Error("Сетевая ошибка сервера");
+      if (!response.ok) {
+        const problem = await response.json();
+        throw new Error(problem.detail || "Ошибка сервера");
+      }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
@@ -126,7 +124,7 @@ const ChatbotPage = () => {
       setMessages((prev) => {
         const newMsgs = [...prev];
         newMsgs[newMsgs.length - 1].content =
-          "⚠️ Ошибка подключения к бэкенду.";
+          `⚠️ ${error.message}`;
         return newMsgs;
       });
     } finally {
@@ -152,24 +150,25 @@ const ChatbotPage = () => {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-4xl relative z-10 bg-white/60 dark:bg-gray-900/60 backdrop-blur-2xl rounded-3xl border border-white/40 shadow-2xl flex flex-col h-[80vh]"
       >
-        <div className="flex items-center justify-between p-6 border-b border-gray-200/50 bg-white/40">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200/50 bg-white/40 dark:bg-gray-900/60">
           <div className="flex items-center gap-4">
             <div className="flex items-center justify-center w-12 h-12 shadow-lg bg-gradient-to-br from-indigo-500 to-primary rounded-xl">
               <Bot className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-textMain dark:text-textMainDark">
+              <h1 className="text-xl font-bold text-textMain dark:text-textMainDark">
                 AI Консультант
-              </h2>
-              <p className="flex items-center gap-2 text-sm text-textMuted">
+              </h1>
+              <p className="flex items-center gap-2 text-sm text-textMuted dark:text-textMutedDark">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>{" "}
                 Онлайн
               </p>
             </div>
           </div>
           <button
+            aria-label="Очистить историю"
             onClick={handleClear}
-            className="p-2 text-gray-400 transition-colors hover:text-red-500 hover:bg-red-50 rounded-xl"
+            className="p-2 text-gray-600 dark:text-gray-300 transition-colors hover:text-red-500 hover:bg-red-50 rounded-xl"
           >
             <Trash2 className="w-5 h-5" />
           </button>
@@ -240,7 +239,7 @@ const ChatbotPage = () => {
                 {msg.role === "assistant" && msg.content && (
                   <button
                     onClick={() => speakText(msg.content)}
-                    className="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-primary transition-colors mt-1 ml-1"
+                    className="flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-primary transition-colors mt-1 ml-1"
                   >
                     {isSpeaking ? (
                       <>
@@ -259,9 +258,10 @@ const ChatbotPage = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="p-6 border-t bg-white/40 border-gray-200/50">
+        <div className="p-6 border-t bg-white/40 dark:bg-gray-900/60 border-gray-200/50">
           <form onSubmit={handleSend} className="relative flex items-center">
             <input
+              aria-label="Сообщение"
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -270,6 +270,7 @@ const ChatbotPage = () => {
               className="w-full py-4 pl-6 pr-16 transition-all bg-white border border-gray-200 shadow-sm outline-none rounded-2xl focus:ring-2 focus:ring-primary disabled:opacity-70"
             />
             <button
+              aria-label="Отправить сообщение"
               type="submit"
               disabled={!input.trim() || isLoading}
               className="absolute p-3 text-white transition-colors right-2 bg-primary rounded-xl hover:bg-primaryHover disabled:opacity-50"

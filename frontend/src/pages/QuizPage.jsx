@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClipboardList, CheckCircle2, RefreshCw, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import api from "../api/index";
+import api from "../api/Index";
 
 const questions = [
   {
@@ -62,7 +62,7 @@ const QuizPage = () => {
         total,
       });
       setAiTip(response.data.feedback);
-    } catch (error) {
+    } catch {
       setAiTip(t("quiz.error") || "Ошибка получения совета от ИИ.");
     } finally {
       setIsLoading(false);

@@ -1,4 +1,4 @@
-import api from "./index";
+import api from "./Index";
 
 export const loginUser = async (email, password) => {
   const response = await api.post("/auth/login", { email, password });

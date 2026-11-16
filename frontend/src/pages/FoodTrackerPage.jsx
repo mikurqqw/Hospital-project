@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Utensils, Zap, ShieldCheck, Loader2 } from "lucide-react";
-import api from "../api/index";
+import { Camera, Utensils, Zap, Loader2 } from "lucide-react";
+import api from "../api/Index";
 
 const FoodTrackerPage = () => {
   const [image, setImage] = useState(null);
@@ -30,7 +30,7 @@ const FoodTrackerPage = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setAnalysis(response.data.analysis);
-    } catch (error) {
+    } catch {
       setAnalysis("Ошибка анализа еды. Проверьте Ollama.");
     } finally {
       setIsLoading(false);

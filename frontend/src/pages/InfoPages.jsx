@@ -5,7 +5,6 @@ import {
   Phone,
   MapPin,
   Star,
-  Clock,
   CalendarHeart,
   HeartPulse,
   ShieldCheck,
@@ -352,7 +351,6 @@ export const DoctorsPage = () => {
 
 // --- СТРАНИЦА "О НАС" ---
 export const AboutPage = () => {
-  const { t } = useTranslation();
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen px-4 py-20 overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-rose-500/5 to-primary/5"></div>
@@ -370,8 +368,8 @@ export const AboutPage = () => {
         <p className="mb-12 text-lg leading-relaxed text-textMuted dark:text-textMutedDark">
           Мы — инновационный проект на стыке классической медицины и передовых
           технологий. Наша миссия — дать каждому человеку мгновенный, безопасный
-          и приватный доступ к предварительной диагностике с использованием
-          локальных нейросетей, которые не отправляют ваши данные в облако.
+          доступ к учебным AI-инструментам. Эта демоверсия использует облачный Gemini.
+          Вводите только вымышленные данные и учебные изображения.
         </p>
         <div className="grid grid-cols-1 gap-6 text-left md:grid-cols-3">
           <div className="p-6 border border-gray-100 bg-white/50 dark:bg-black/20 rounded-3xl dark:border-gray-800">
@@ -389,7 +387,7 @@ export const AboutPage = () => {
               Конфиденциальность
             </h3>
             <p className="text-sm text-textMuted dark:text-textMutedDark">
-              Нейросети работают локально. Ваши снимки остаются у вас.
+              Запросы и изображения отправляются в Gemini. Не загружайте персональные данные.
             </p>
           </div>
           <div className="p-6 border border-gray-100 bg-white/50 dark:bg-black/20 rounded-3xl dark:border-gray-800">
@@ -398,7 +396,7 @@ export const AboutPage = () => {
               Скорость
             </h3>
             <p className="text-sm text-textMuted dark:text-textMutedDark">
-              Мгновенный ответ 24/7 в любой экстренной ситуации.
+              Ответы зависят от доступности и лимитов бесплатного API. Не для экстренных ситуаций.
             </p>
           </div>
         </div>
@@ -409,7 +407,6 @@ export const AboutPage = () => {
 
 // --- СТРАНИЦА "КОНТАКТЫ" ---
 export const ContactPage = () => {
-  const { t } = useTranslation();
   return (
     <div className="relative flex items-center justify-center min-h-screen px-4 py-20">
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none z-0"></div>

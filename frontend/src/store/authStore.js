@@ -1,16 +1,12 @@
 import { create } from "zustand";
 
+// Demo sessions live in memory and expire on reload; never persist bearer tokens.
+localStorage.removeItem("token");
+localStorage.removeItem("auth-storage");
 export const useAuthStore = create((set) => ({
+  token: null,
   user: null,
-  isAuthenticated: !!localStorage.getItem("token"),
-
-  login: (token, userData) => {
-    localStorage.setItem("token", token);
-    set({ user: userData, isAuthenticated: true });
-  },
-
-  logout: () => {
-    localStorage.removeItem("token");
-    set({ user: null, isAuthenticated: false });
-  },
+  isAuthenticated: false,
+  login: (token, user) => set({ token, user, isAuthenticated: true }),
+  logout: () => set({ token: null, user: null, isAuthenticated: false }),
 }));

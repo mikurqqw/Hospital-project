@@ -50,6 +50,7 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
             ФИО
           </label>
           <input
+            aria-label="ФИО"
             {...register("full_name")}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-textMain dark:text-textMainDark focus:ring-2 focus:ring-primary outline-none transition-all"
             placeholder="Иван Иванов"
@@ -66,6 +67,7 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
             Email
           </label>
           <input
+            aria-label="Email"
             {...register("email")}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-textMain dark:text-textMainDark focus:ring-2 focus:ring-primary outline-none transition-all"
             placeholder="mail@example.com"
@@ -81,6 +83,7 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
           </label>
           <input
             type="password"
+            aria-label="Пароль"
             {...register("password")}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-textMain dark:text-textMainDark focus:ring-2 focus:ring-primary outline-none transition-all"
             placeholder="••••••••"

@@ -1,0 +1,27 @@
+name: Checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: sqlite:///./ci.db
+      GEMINI_API_KEY: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r backend/requirements-dev.txt
+      - run: npm ci && npm run lint && npm run build && npm audit
+        working-directory: frontend
+      - run: python -m ruff check app && python -m ruff format --check app && python -m mypy --strict app && python -m pytest && python -m bandit -r app -q && python -m pip_audit -r requirements.lock
+        working-directory: backend
+      - run: npx playwright install --with-deps chromium && npm run test:e2e
+        working-directory: frontend

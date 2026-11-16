@@ -1,4 +1,4 @@
-import api from "./index";
+import api from "./Index";
 
 export const analyzeMedicalImage = async (imageFile) => {
   const formData = new FormData();

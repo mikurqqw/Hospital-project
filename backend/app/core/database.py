@@ -1,19 +1,18 @@
+from collections.abc import Generator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+
 from app.core.config import settings
 
-# Для SQLite нужен параметр check_same_thread=False
-engine = create_engine(
-    settings.DATABASE_URL, connect_args={"check_same_thread": False}
-)
+engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
 
-# Зависимость для получения сессии БД в эндпоинтах
-def get_db():
-    db = SessionLocal()
-    try:
+class Base(DeclarativeBase):
+    pass
+
+
+def get_db() -> Generator[Session]:
+    with SessionLocal() as db:
         yield db
-    finally:
-        db.close()

@@ -9,12 +9,9 @@ import {
   AlertCircle,
   FileDown,
 } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import html2pdf from "html2pdf.js";
-import api from "../api/index";
+import api from "../api/Index";
 
 const SymptomCheckerPage = () => {
-  const { t } = useTranslation();
   const [symptoms, setSymptoms] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [result, setResult] = useState(null);
@@ -69,7 +66,7 @@ const SymptomCheckerPage = () => {
     try {
       const response = await api.post("/symptoms/check", { symptoms });
       setResult(response.data.analysis);
-    } catch (error) {
+    } catch {
       setResult(
         "⚠️ Ошибка анализа. Убедитесь, что ИИ включен и сервер запущен.",
       );
@@ -78,7 +75,7 @@ const SymptomCheckerPage = () => {
     }
   };
 
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     const element = document.getElementById("ai-report");
     const opt = {
       margin: 0.5,
@@ -87,6 +84,7 @@ const SymptomCheckerPage = () => {
       html2canvas: { scale: 2 },
       jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
     };
+    const { default: html2pdf } = await import("html2pdf.js");
     html2pdf().set(opt).from(element).save();
   };
 
@@ -108,7 +106,7 @@ const SymptomCheckerPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="max-w-2xl mx-auto text-lg text-textMuted"
+            className="max-w-2xl mx-auto text-lg text-textMuted dark:text-textMutedDark"
           >
             Выберите симптомы из списка или введите их вручную, чтобы получить
             предварительный анализ от нейросети.
@@ -122,7 +120,7 @@ const SymptomCheckerPage = () => {
         >
           {/* Быстрые кнопки выбора */}
           <div className="mb-8">
-            <p className="mb-4 text-sm font-bold tracking-wider uppercase text-textMuted">
+            <p className="mb-4 text-sm font-bold tracking-wider uppercase text-textMuted dark:text-textMutedDark">
               Частые симптомы:
             </p>
             <div className="flex flex-wrap gap-2.5">
@@ -135,7 +133,7 @@ const SymptomCheckerPage = () => {
                     className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border ${
                       isSelected
                         ? "bg-primary text-white border-primary shadow-lg shadow-primary/30 transform scale-105"
-                        : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-textMain hover:border-primary/50"
+                        : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-textMain dark:text-textMainDark hover:border-primary/50"
                     }`}
                   >
                     {sym}
@@ -162,6 +160,7 @@ const SymptomCheckerPage = () => {
               className="w-full py-4 pl-12 pr-16 bg-white border border-gray-200 outline-none dark:bg-gray-800 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-primary text-textMain dark:text-textMainDark"
             />
             <button
+              aria-label="Добавить симптом"
               type="submit"
               disabled={!inputValue.trim()}
               className="absolute right-2 p-2.5 bg-primary text-white rounded-xl hover:bg-primaryHover disabled:opacity-50 transition-all"
@@ -172,13 +171,13 @@ const SymptomCheckerPage = () => {
 
           {/* Список выбранных */}
           <div className="p-6 mb-8 border border-gray-100 bg-gray-50/50 dark:bg-black/20 rounded-2xl dark:border-gray-800/50">
-            <p className="mb-4 text-xs font-black tracking-widest uppercase text-textMuted">
+            <p className="mb-4 text-xs font-black tracking-widest uppercase text-textMuted dark:text-textMutedDark">
               Выбрано для анализа:
             </p>
             <div className="flex flex-wrap gap-2 min-h-[40px]">
               <AnimatePresence>
                 {symptoms.length === 0 ? (
-                  <p className="flex items-center gap-2 text-sm italic text-gray-400">
+                  <p className="flex items-center gap-2 text-sm italic text-gray-600 dark:text-gray-300">
                     <AlertCircle size={16} /> Выберите хотя бы один симптом
                   </p>
                 ) : (
@@ -192,6 +191,7 @@ const SymptomCheckerPage = () => {
                     >
                       {symptom}
                       <button
+                        aria-label={`Удалить симптом ${symptom}`}
                         onClick={() => removeSymptom(symptom)}
                         className="p-0.5 rounded-full hover:bg-white/50 dark:hover:bg-black/20 transition-colors"
                       >

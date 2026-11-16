@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
+
 
 class HealthDataCreate(BaseModel):
     height: float
@@ -8,6 +10,7 @@ class HealthDataCreate(BaseModel):
     gender: str
     activity_level: str
     sport_type: str
+
 
 class HealthDataResponse(HealthDataCreate):
     id: int

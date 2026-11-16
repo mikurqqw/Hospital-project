@@ -8,3 +8,9 @@
     @apply bg-bgLight text-textMain dark:bg-bgDark dark:text-textMainDark transition-colors duration-300 antialiased;
   }
 }
+
+:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 4px; }
+.dark :focus-visible { outline-color: #93c5fd; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

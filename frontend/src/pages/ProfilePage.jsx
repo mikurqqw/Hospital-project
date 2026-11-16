@@ -7,12 +7,11 @@ import {
   Fingerprint,
   CalendarHeart,
   Trash2,
-  Ruler,
   Scale,
 } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { saveHealthData, getHealthData } from "../api/health";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useAppointmentStore } from "../store/appointmentStore";
 import { useTranslation } from "react-i18next";
 
@@ -63,7 +62,7 @@ const ProfilePage = () => {
       const newRecord = await saveHealthData(payload);
       setLatestData(newRecord);
       toast.success("Данные успешно обновлены!");
-    } catch (error) {
+    } catch {
       toast.error("Ошибка сохранения");
     }
   };

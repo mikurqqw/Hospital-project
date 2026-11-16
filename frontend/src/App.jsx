@@ -1,157 +1,67 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { AnimatePresence, motion } from "framer-motion";
+import { MotionConfig } from "framer-motion";
 import Navbar from "./components/layout/Navbar";
 import HomePage from "./pages/HomePage";
-import ProfilePage from "./pages/ProfilePage";
-import ChatbotPage from "./pages/ChatbotPage";
-import DiagnosticsPage from "./pages/DiagnosticsPage";
-import HealthAnalysisPage from "./pages/HealthAnalysisPage";
-import SymptomCheckerPage from "./pages/SymptomCheckerPage";
-import FirstAidPage from "./pages/FirstAidPage";
-import QuizPage from "./pages/QuizPage";
-import { DoctorsPage, AboutPage, ContactPage } from "./pages/InfoPages";
+import { useAuthStore } from "./store/authStore";
 
-// Глобальная обертка анимации для КАЖДОЙ страницы
-const PageWrapper = ({ children }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 15, filter: "blur(4px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      exit={{ opacity: 0, y: -15, filter: "blur(4px)" }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="w-full h-full"
-    >
-      {children}
-    </motion.div>
-  );
-};
+const Profile = lazy(() => import("./pages/ProfilePage"));
+const Chat = lazy(() => import("./pages/ChatbotPage"));
+const Diagnostics = lazy(() => import("./pages/DiagnosticsPage"));
+const Health = lazy(() => import("./pages/HealthAnalysisPage"));
+const Symptoms = lazy(() => import("./pages/SymptomCheckerPage"));
+const FirstAid = lazy(() => import("./pages/FirstAidPage"));
+const Quiz = lazy(() => import("./pages/QuizPage"));
+const Doctors = lazy(() => import("./pages/InfoPages").then((module) => ({ default: module.DoctorsPage })));
+const About = lazy(() => import("./pages/InfoPages").then((module) => ({ default: module.AboutPage })));
+const Contact = lazy(() => import("./pages/InfoPages").then((module) => ({ default: module.ContactPage })));
 
-// Блок роутинга с отслеживанием путей
-const AnimatedRoutes = () => {
-  const location = useLocation();
-  return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route
-          path="/"
-          element={
-            <PageWrapper>
-              <HomePage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <PageWrapper>
-              <ProfilePage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/chat"
-          element={
-            <PageWrapper>
-              <ChatbotPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/diagnostics"
-          element={
-            <PageWrapper>
-              <DiagnosticsPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/health-analysis"
-          element={
-            <PageWrapper>
-              <HealthAnalysisPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/symptoms"
-          element={
-            <PageWrapper>
-              <SymptomCheckerPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/first-aid"
-          element={
-            <PageWrapper>
-              <FirstAidPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/quiz"
-          element={
-            <PageWrapper>
-              <QuizPage />
-            </PageWrapper>
-          }
-        />
-
-        <Route
-          path="/doctors"
-          element={
-            <PageWrapper>
-              <DoctorsPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/about"
-          element={
-            <PageWrapper>
-              <AboutPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/contact"
-          element={
-            <PageWrapper>
-              <ContactPage />
-            </PageWrapper>
-          }
-        />
-      </Routes>
-    </AnimatePresence>
-  );
-};
-
-function App() {
-  return (
-    <Router>
-      <div className="min-h-screen flex flex-col bg-bgLight dark:bg-[#0f172a] transition-colors duration-500 selection:bg-primary/30 text-textMain dark:text-textMainDark overflow-hidden">
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            className:
-              "dark:bg-gray-800 dark:text-white rounded-2xl shadow-xl backdrop-blur-xl border border-gray-100 dark:border-gray-700",
-            duration: 3000,
-          }}
-        />
-        <Navbar />
-        {/* Добавлен pt-24, так как Navbar теперь fixed и плавает поверх контента */}
-        <main className="flex-grow pt-24">
-          <AnimatedRoutes />
-        </main>
-      </div>
-    </Router>
-  );
+function RequireAuth({ children }) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  if (isAuthenticated) return children;
+  return <div className="mx-auto max-w-xl px-6 py-24 text-center">
+    <h1 className="text-3xl font-bold mb-4">Войдите, чтобы продолжить</h1>
+    <p>Нажмите «Войти» в верхнем меню или значок профиля на телефоне. Для презентации создайте аккаунт с вымышленными данными.</p>
+  </div>;
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
+function App() {
+  return <MotionConfig reducedMotion="user">
+    <BrowserRouter>
+      <ScrollToTop />
+      <div className="min-h-screen flex flex-col bg-bgLight dark:bg-bgDark text-textMain dark:text-textMainDark overflow-hidden">
+        <Toaster position="top-center" />
+        <Navbar />
+        <main className="flex-grow pt-28">
+          <div role="note" className="mx-auto max-w-7xl px-4 py-3 text-sm text-amber-950 dark:text-amber-100 bg-amber-50 dark:bg-amber-950/50 rounded-xl">
+            Учебная демоверсия · ИИ: Gemini · Только вымышленные данные. Запросы и снимки отправляются в Google. Данные могут сбрасываться. Не для медицинских решений.
+          </div>
+          <Suspense fallback={<p role="status" className="p-12 text-center">Загрузка страницы…</p>}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+              <Route path="/chat" element={<RequireAuth><Chat /></RequireAuth>} />
+              <Route path="/diagnostics" element={<RequireAuth><Diagnostics /></RequireAuth>} />
+              <Route path="/health-analysis" element={<RequireAuth><Health /></RequireAuth>} />
+              <Route path="/symptoms" element={<RequireAuth><Symptoms /></RequireAuth>} />
+              <Route path="/quiz" element={<RequireAuth><Quiz /></RequireAuth>} />
+              <Route path="/first-aid" element={<FirstAid />} />
+              <Route path="/doctors" element={<Doctors />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="*" element={<div className="p-24 text-center"><h1>Страница не найдена</h1><a href="/">На главную</a></div>} />
+            </Routes>
+          </Suspense>
+        </main>
+      </div>
+    </BrowserRouter>
+  </MotionConfig>;
+}
 export default App;

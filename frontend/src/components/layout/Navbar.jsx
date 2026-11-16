@@ -130,6 +130,7 @@ const Navbar = () => {
               </div>
 
               <button
+                aria-label={isDarkMode ? "Светлая тема" : "Тёмная тема"}
                 onClick={toggleTheme}
                 className="p-2 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-textMain dark:text-textMainDark"
               >
@@ -156,6 +157,11 @@ const Navbar = () => {
                 </AnimatePresence>
               </button>
 
+              <button onClick={isAuthenticated ? () => navigate("/profile") : openLogin}
+                aria-label={isAuthenticated ? "Профиль" : "Войти"}
+                className="sm:hidden p-3 rounded-full text-primary dark:text-blue-300">
+                <User className="h-5 w-5" />
+              </button>
               <div className="items-center hidden gap-2 pl-4 ml-2 border-l border-gray-200 sm:flex dark:border-gray-800">
                 {isAuthenticated ? (
                   <>

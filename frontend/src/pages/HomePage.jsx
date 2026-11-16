@@ -51,17 +51,17 @@ const HomePage = () => {
       <section className="relative z-10 pt-20 pb-20 overflow-hidden lg:pt-32 lg:pb-28">
         <div className="px-4 mx-auto text-center max-w-7xl sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, scale: 0.5, filter: "blur(10px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            initial={false}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-50/80 dark:bg-blue-900/30 text-primary font-bold text-sm mb-8 border border-blue-100/50 dark:border-blue-800/50 backdrop-blur-xl shadow-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-50/80 dark:bg-blue-900/30 text-primary dark:text-blue-300 font-bold text-sm mb-8 border border-blue-100/50 dark:border-blue-800/50 backdrop-blur-xl shadow-sm"
           >
             <Zap className="w-4 h-4 text-amber-500" />
             <span>{t("home.badge")}</span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
             className="mb-8 text-5xl font-black leading-tight tracking-tight md:text-7xl lg:text-8xl text-textMain dark:text-textMainDark"
@@ -73,7 +73,7 @@ const HomePage = () => {
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 30 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="max-w-2xl mx-auto mt-4 mb-12 text-xl font-medium text-textMuted dark:text-textMutedDark"
@@ -82,7 +82,7 @@ const HomePage = () => {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
             className="flex flex-col justify-center gap-5 sm:flex-row"
@@ -110,7 +110,7 @@ const HomePage = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
             className="grid max-w-5xl grid-cols-1 gap-6 mx-auto mt-24 md:grid-cols-3"
@@ -119,20 +119,20 @@ const HomePage = () => {
               {
                 icon: ShieldCheck,
                 color: "green",
-                title: "Конфиденциально",
-                desc: "Локальная нейросеть бережет ваши данные",
+                title: "Облачный ИИ",
+                desc: "Gemini обрабатывает учебные запросы",
               },
               {
                 icon: Zap,
                 color: "blue",
-                title: "Мгновенно",
-                desc: "Ответы и расшифровки за секунды",
+                title: "Для презентации",
+                desc: "Бесплатный API с ограничениями",
               },
               {
                 icon: HeartPulse,
                 color: "rose",
-                title: "Персонализировано",
-                desc: "Адаптация под ваш спорт и вес",
+                title: "Личный профиль",
+                desc: "Показатели и история ваших записей",
               },
             ].map((feature, i) => (
               <motion.div

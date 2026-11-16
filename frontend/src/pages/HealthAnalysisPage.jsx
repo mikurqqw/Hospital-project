@@ -106,7 +106,7 @@ const HealthAnalysisPage = () => {
   let maintenanceCalories = baseTdee + sportBonus;
 
   let finalCalories = maintenanceCalories;
-  let macros = { p: 0, f: 0, c: 0 };
+  let macros;
 
   if (goal === "cut") {
     finalCalories -= 500;

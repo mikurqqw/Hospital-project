@@ -95,14 +95,15 @@ const ServicesSection = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
-            <motion.div
+            <motion.button
+              type="button"
               key={service.id}
               onClick={() => navigate(service.path)}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-cardLight dark:bg-cardDark rounded-2xl p-8 shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 group cursor-pointer"
+              className="text-left bg-cardLight dark:bg-cardDark rounded-2xl p-8 shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 group cursor-pointer"
             >
               <div
                 className={`w-14 h-14 rounded-xl ${service.bg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
@@ -115,7 +116,7 @@ const ServicesSection = () => {
               <p className="text-textMuted dark:text-textMutedDark leading-relaxed">
                 {service.desc}
               </p>
-            </motion.div>
+            </motion.button>
           ))}
         </div>
       </div>

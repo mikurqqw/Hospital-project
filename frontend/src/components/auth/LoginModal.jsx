@@ -43,6 +43,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToRegister }) => {
             Email
           </label>
           <input
+            aria-label="Email"
             {...register("email")}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-textMain dark:text-textMainDark focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             placeholder="mail@example.com"
@@ -58,6 +59,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToRegister }) => {
           </label>
           <input
             type="password"
+            aria-label="Пароль"
             {...register("password")}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-textMain dark:text-textMainDark focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             placeholder="••••••••"

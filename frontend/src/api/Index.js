@@ -1,16 +1,10 @@
 import axios from "axios";
+import { useAuthStore } from "../store/authStore";
 
-const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api", // Проверь, что порт совпадает с uvicorn
-});
-
-// Автоматически подставляем токен в каждый запрос
+const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL || "/api" });
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  const token = useAuthStore.getState().token;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
-
 export default api;

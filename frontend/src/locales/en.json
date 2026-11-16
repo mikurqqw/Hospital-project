@@ -11,9 +11,9 @@
   },
   "home": {
     "badge": "The next generation of healthcare",
-    "title_1": "Your personal AI doctor",
+    "title_1": "Your AI assistant",
     "title_2": "in your pocket",
-    "subtitle": "Instant symptom analysis, personalized nutrition and training recommendations, medical image decoding using neural networks.",
+    "subtitle": "An educational health project: Gemini chat, symptom information, image descriptions and personal records.",
     "btn_ai": "Try AI",
     "btn_body": "Body Analysis"
   },
@@ -21,7 +21,7 @@
     "title": "Intelligent Services",
     "subtitle": "Leverage the power of AI for comprehensive health monitoring",
     "diag_title": "AI Diagnostics",
-    "diag_desc": "Upload MRI or X-ray images for instant analysis by the LLaVA neural network.",
+    "diag_desc": "Upload MRI or X-ray images for instant analysis by the Gemini neural network.",
     "health_title": "Health Analysis",
     "health_desc": "Personal calculation of macronutrients, calories, and water intake based on your body data.",
     "symptoms_title": "Symptom Checker",

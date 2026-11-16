@@ -1,4 +1,4 @@
-import api from "./index";
+import api from "./Index";
 
 export const getChatHistory = async () => {
   const response = await api.get("/chat/history");

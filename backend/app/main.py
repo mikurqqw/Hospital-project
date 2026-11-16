@@ -1,59 +1,86 @@
-import os
-from fastapi import FastAPI, HTTPException
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from app.core.database import engine, Base
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
+from starlette.middleware.base import RequestResponseEndpoint
+from starlette.responses import Response
 
-# Импортируем роутеры
-from app.api.routes import auth, health, chat, diagnostics, symptoms, quiz
+from app.api.routes import auth, chat, diagnostics, health, quiz, symptoms
+from app.core.config import settings
+from app.core.database import Base, engine
+from app.core.rate_limit import rate_limit
 
-Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="AI Health")
+@asynccontextmanager
+async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+    # Start with an empty demo database; never ship historical patient records.
+    Base.metadata.create_all(bind=engine)
+    yield
+    engine.dispose()
 
-# CORS
+
+app = FastAPI(title="AI Health Demo", lifespan=lifespan)
+app.middleware("http")(rate_limit)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
-# API Роуты
-app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-app.include_router(health.router, prefix="/api/health", tags=["health"]) 
-app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
-app.include_router(diagnostics.router, prefix="/api/diagnostics", tags=["diagnostics"])
-app.include_router(symptoms.router, prefix="/api/symptoms", tags=["symptoms"])
-app.include_router(quiz.router, prefix="/api/quiz", tags=["quiz"])
 
-# --- ИНТЕГРАЦИЯ ФРОНТЕНДА (ОДИН СЕРВЕР) ---
-# Получаем абсолютный путь к папке frontend/dist
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_ROOT = os.path.dirname(BASE_DIR)
-frontend_dist = os.path.join(PROJECT_ROOT, "frontend", "dist")
+@app.middleware("http")
+async def security_headers(
+    request: Request, call_next: RequestResponseEndpoint
+) -> Response:
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
-if os.path.exists(frontend_dist):
-    # 1. Раздаем статические файлы (JS, CSS, картинки) из папки assets
-    assets_path = os.path.join(frontend_dist, "assets")
-    if os.path.exists(assets_path):
-        app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
 
-    # 2. Раздаем остальные файлы и перенаправляем на index.html для работы React Router
+@app.get("/api/healthz")
+def readiness() -> dict[str, object]:
+    with engine.connect() as connection:
+        connection.execute(text("SELECT 1"))
+    return {
+        "status": "ok",
+        "demo": settings.DEMO_MODE,
+        "ai_configured": bool(settings.GEMINI_API_KEY.get_secret_value()),
+    }
+
+
+for name, module in [
+    ("auth", auth),
+    ("health", health),
+    ("chat", chat),
+    ("diagnostics", diagnostics),
+    ("symptoms", symptoms),
+    ("quiz", quiz),
+]:
+    app.include_router(module.router, prefix=f"/api/{name}", tags=[name])
+
+frontend_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+if frontend_dist.is_dir():
+    app.mount("/assets", StaticFiles(directory=frontend_dist / "assets"), name="assets")
+
     @app.get("/{catchall:path}")
-    def serve_react_app(catchall: str):
-        # Защита: если запрос начинается с /api/, но роута нет — выдаем 404 ошибку API, а не HTML страницу
-        if catchall.startswith("api/"):
+    def serve_react_app(catchall: str) -> FileResponse:
+        if catchall == "api" or catchall.startswith("api/"):
             raise HTTPException(status_code=404, detail="API route not found")
-        
-        # Если запрашивается конкретный файл в корне (например, favicon.png)
-        file_path = os.path.join(frontend_dist, catchall)
-        if os.path.isfile(file_path):
+        file_path = (frontend_dist / catchall).resolve()
+        if not file_path.is_relative_to(frontend_dist):
+            raise HTTPException(status_code=404, detail="Not found")
+        if file_path.is_file():
             return FileResponse(file_path)
-        
-        # Для всех остальных путей (например, /profile, /chat) отдаем index.html
-        return FileResponse(os.path.join(frontend_dist, "index.html"))
-else:
-    print("ВНИМАНИЕ: Папка frontend/dist не найдена. Скрипт start.bat соберет её автоматически.")
+        return FileResponse(frontend_dist / "index.html")
